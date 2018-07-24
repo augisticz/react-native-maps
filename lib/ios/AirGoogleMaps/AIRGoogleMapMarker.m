@@ -11,7 +11,7 @@
 #import <React/RCTUtils.h>
 #import "AIRGMSMarker.h"
 #import "AIRGoogleMapCallout.h"
-#import "AIRDummyView.h"
+#import "DummyView.h"
 
 CGRect unionRect(CGRect a, CGRect b) {
   return CGRectMake(
@@ -37,7 +37,6 @@ CGRect unionRect(CGRect a, CGRect b) {
     _realMarker = [[AIRGMSMarker alloc] init];
     _realMarker.fakeMarker = self;
     _realMarker.tracksViewChanges = true;
-    _realMarker.tracksInfoWindowChanges = false;
   }
   return self;
 }
@@ -90,12 +89,12 @@ CGRect unionRect(CGRect a, CGRect b) {
   } else { // a child view of the marker
     [self iconViewInsertSubview:(UIView*)subview atIndex:atIndex+1];
   }
-  AIRDummyView *dummySubview = [[AIRDummyView alloc] initWithView:(UIView *)subview];
+  DummyView *dummySubview = [[DummyView alloc] initWithView:(UIView *)subview];
   [super insertReactSubview:(UIView*)dummySubview atIndex:atIndex];
 }
 
 - (void)removeReactSubview:(id<RCTComponent>)dummySubview {
-  UIView* subview = ((AIRDummyView*)dummySubview).view;
+  UIView* subview = ((DummyView*)dummySubview).view;
 
   if ([subview isKindOfClass:[AIRGoogleMapCallout class]]) {
     self.calloutView = nil;
@@ -224,7 +223,7 @@ CGRect unionRect(CGRect a, CGRect b) {
                                                                  dispatch_async(dispatch_get_main_queue(), ^{
 
                                                                    // TODO(gil): This way allows different image sizes
-                                                                   if (self->_iconImageView) [self->_iconImageView removeFromSuperview];
+                                                                   if (_iconImageView) [_iconImageView removeFromSuperview];
 
                                                                    // ... but this way is more efficient?
 //                                                                   if (_iconImageView) {
@@ -250,7 +249,7 @@ CGRect unionRect(CGRect a, CGRect b) {
                                                                    CGRect selfBounds = unionRect(bounds, self.bounds);
                                                                    [self setFrame:selfBounds];
 
-                                                                   self->_iconImageView = imageView;
+                                                                   _iconImageView = imageView;
                                                                    [self iconViewInsertSubview:imageView atIndex:0];
                                                                  });
                                                                }];
@@ -282,11 +281,6 @@ CGRect unionRect(CGRect a, CGRect b) {
   _realMarker.groundAnchor = anchor;
 }
 
-- (void)setCalloutAnchor:(CGPoint)calloutAnchor {
-  _calloutAnchor = calloutAnchor;
-  _realMarker.infoWindowAnchor = calloutAnchor;
-}
-
 
 - (void)setZIndex:(NSInteger)zIndex
 {
@@ -308,14 +302,6 @@ CGRect unionRect(CGRect a, CGRect b) {
 
 - (BOOL)tracksViewChanges {
   return _realMarker.tracksViewChanges;
-}
-
-- (void)setTracksInfoWindowChanges:(BOOL)tracksInfoWindowChanges {
-  _realMarker.tracksInfoWindowChanges = tracksInfoWindowChanges;
-}
-
-- (BOOL)tracksInfoWindowChanges {
-  return _realMarker.tracksInfoWindowChanges;
 }
 
 @end
